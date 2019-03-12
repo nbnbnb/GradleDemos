@@ -1,0 +1,36 @@
+apply plugin: 'groovy'
+apply plugin: 'maven'
+
+dependencies {
+    compile gradleApi()
+    compile localGroovy()
+}
+
+// 这个就是 plugin id
+group = 'me.zhangjin.gradle.greeting'
+version = '0.0.2'
+
+sourceCompatibility = 11
+targetCompatibility = 11
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            // 使用命令
+            // gradle uploadArchives
+            // 安装到本地的 Maven 仓库
+            // 这种模式需要通过使用 legacy plugin application 方式引用插件
+            // https://docs.gradle.org/current/userguide/plugins.html#sec:old_plugin_application
+
+            // 新式的插件方式读取的是
+            // Gradle Core Plugins (plugin is not in 'org.gradle' namespace)
+            // Plugin Repositories (plugin dependency must include a version number for this source)
+            // 此时需要将自定义插件上传到 https://plugins.gradle.org/
+            repository(url: uri('D:\\MavenRepository'))
+        }
+    }
+}
