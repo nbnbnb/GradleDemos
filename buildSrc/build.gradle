@@ -6,7 +6,11 @@ dependencies {
     compile localGroovy()
 }
 
-// 这个就是 plugin id
+// Maven 仓库的坐标
+// <groupId>me.zhangjin.gradle.greeting</groupId>
+// <artifactId>CustomPlugins</artifactId>
+// <version>0.0.2</version>
+
 group = 'me.zhangjin.gradle.greeting'
 version = '0.0.2'
 

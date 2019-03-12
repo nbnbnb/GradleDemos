@@ -115,7 +115,91 @@ tasks.register("showHelloFile") {
 // 在 ./build 目录下会生成一个 hello.txt 文件
 extra["greetingFile"] = "$buildDir/hello.txt"
 
-// 测试
-// 在根目录下执行 gradle greeting 将会执行两个任务，跟目录任务，和子目录任务
+// 实例 3，DSL 功能
+open class Person {
+    var name: String? = null
+}
 
-// 问题：子项目中不能执行 gradle greeting 命令（找不到插件？）
+// 注意，此处的 @javax.inject.Inject
+// 注入了一个 ObjectFactory
+open class PersonPluginExtension @javax.inject.Inject constructor(objectFactory: ObjectFactory) {
+    var message: String? = null
+    // 此处指定了要实例化一个 Person 对象
+    val person: Person = objectFactory.newInstance()
+
+    fun show(action: Action<in Person>) {
+        // 将这个初始化的 Person 对象
+        // 传入 action 中进行配置
+        action.execute(person)
+    }
+}
+
+
+class PersonPlugin : Plugin<Project> {
+    override fun apply(project: Project) {
+        // Create the 'greeting' extension
+        val jack = project.extensions.create<PersonPluginExtension>("jack")
+        project.task("personShow") {
+            doLast {
+                println("${jack.message} from ${jack.person.name}")
+            }
+        }
+    }
+}
+
+apply<PersonPlugin>()
+
+// apply 后才能进行配置
+configure<PersonPluginExtension> {
+    message = "Person Show"
+    // 配置 Person 对象
+    show {
+        name = "jack"
+    }
+}
+
+// 示例 4，DSL
+class Book(val name: String) {
+    var sourceFile: File? = null
+}
+
+class DocumentationPlugin : Plugin<Project> {
+    override fun apply(project: Project) {
+        // 此处创建了一个容器
+        val books = project.container<Book>()
+        // 容器可以使用 all 进行遍历
+        books.all {
+            sourceFile = project.file("src/docs/$name")
+        }
+        // 最后将容器添加到 project 的 extensions 集合中
+        // 注意，此处要定义唯一的参数键 booksForInit
+        project.extensions.add("booksForInit", books)
+    }
+}
+
+apply<DocumentationPlugin>()
+
+// 通过 by（Delegate 语法）从 project.extensions 集合中获取 books
+// 注意，此处的参数名称一定要是 booksForInit
+val booksForInit: NamedDomainObjectContainer<Book> by project.extensions
+
+booksForInit {
+    // create 方法相对于调用 Book 的构造函数
+    // 传递一个 name 参数
+    create("quickStart") {
+        // 重写了 sourceFile 属性
+        sourceFile = file("src/docs/quick-start")
+    }
+    create("userGuide")
+    create("developerGuide")
+}
+
+// 注册一个任务
+// 显示所有的 books 信息
+tasks.register("booksShow") {
+    doLast {
+        booksForInit.forEach { book ->
+            println("${book.name} -> ${book.sourceFile}")
+        }
+    }
+}

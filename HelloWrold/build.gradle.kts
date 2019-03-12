@@ -6,7 +6,7 @@ plugins {
     kotlin("jvm") version "1.3.21"
 }
 
-group = "me.zhangjin.gradle.helloworld"
+group = "me.zhangjin.gradle"
 version = "1.0-SNAPSHOT"
 
 dependencies {
