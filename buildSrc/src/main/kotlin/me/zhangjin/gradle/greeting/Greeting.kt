@@ -12,7 +12,7 @@ open class Greeting : DefaultTask() {
 
     @TaskAction
     fun sayGreeting() {
-        println("${message}, ${recipient}, ${extension.extMessage}")
+        println("${message}, ${recipient}, ${extension.extMessage} ${extension.person.name}")
         // 从 project.extra 中读取配置信息
         println(project.extra["greeting"])
     }
