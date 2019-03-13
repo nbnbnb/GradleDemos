@@ -37,7 +37,7 @@ allprojects {
     // 重写插件扩展属性里面的信息
     // 这个一定要在 apply 之后配置
     configure<GreetingPluginExtension> {
-        extMessage = "Hi Gradle"
+        extMessage = "<ExtMessage> Hi,Gradle"
     }
 }
 
