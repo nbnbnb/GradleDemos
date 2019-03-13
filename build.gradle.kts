@@ -1,4 +1,5 @@
 import me.zhangjin.gradle.greeting.Greeting
+import me.zhangjin.gradle.greeting.GreetingPluginExtension
 
 plugins {
     // 使用 plugin id 的方式来应用插件
@@ -27,49 +28,19 @@ allprojects {
     tasks.getByName<Greeting>("greeting") {
         message = "Hi"
     }
-}
 
+    // 配置自定义插件 withType 方式
+    tasks.withType<Greeting> {
+        recipient = "Gradle from Parent"
+    }
 
-// 配置自定义插件 withType 方式
-tasks.withType<Greeting> {
-    recipient = "Gradle from Parent"
-}
-
-// -------------------
-
-// ------------------------
-
-// 在 build.gradle.kts 中自定义插件
-class GreetingPlugin : Plugin<Project> {
-    override fun apply(project: Project) {
-        // 使用插件扩展属性
-        // 命名为 greeting
-        val greeting = project.extensions.create<GreetingPluginExtension>("greeting")
-        // Add a task that uses configuration from the extension object
-        project.task("hello") {
-            doLast {
-                // 读取扩展属性的信息
-                println(greeting.message)
-            }
-        }
+    // 重写插件扩展属性里面的信息
+    // 这个一定要在 apply 之后配置
+    configure<GreetingPluginExtension> {
+        extMessage = "Hi Gradle"
     }
 }
 
-
-// 设置插件扩展属性
-open class GreetingPluginExtension {
-    var message = "Hello from GreetingPlugin"
-}
-
-
-// 应用自定义插件
-apply<GreetingPlugin>()
-
-// 重写插件扩展属性里面的信息
-// 这个一定要在 apply 之后配置
-configure<GreetingPluginExtension> {
-    message = "Hi Gradle"
-}
 
 // -------- 自定义插件 02
 
